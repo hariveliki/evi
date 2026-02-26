@@ -1,0 +1,66 @@
+calculation_parameters:
+  as_of_date: null  # null = use today's date
+  rebalance_frequency: "quarterly"
+  data_lag_days: 5
+
+  valuation_inputs:
+    pe_type: "trailing_12m"
+    pb_type: "latest"
+    earnings_growth_type: null
+
+  baseline:
+    baseline_method: "rolling_median"
+    lookback_years: 10
+    min_history_years: 5
+
+  scoring:
+    score_method: "log_ratio"
+    winsorize:
+      enabled: true
+      method: "clip"
+      limits: [-2.5, 2.5]
+
+  combine_metrics:
+    metric_weights:
+      pe: 0.6
+      pb: 0.4
+    missing_metric_rule: "reweight"
+
+  adjustment:
+    function: "exp_score"
+    strength_k: 0.8
+    alpha: 0.5
+    beta: 0.5
+
+  constraints:
+    weight_floor: 0.02
+    weight_ceiling: 0.60
+    max_overweight_pp: 7.5
+    max_underweight_pp: -7.5
+    shrinkage_to_mcap_lambda: 0.20
+    turnover_cap_pp: 10.0
+
+regions:
+  - name: "North America"
+    index_proxy: "S&P 500"
+    etf_ticker: "SPY"
+
+  - name: "Europe"
+    index_proxy: "Stoxx Europe 600"
+    etf_ticker: "VGK"
+
+  - name: "Emerging Markets"
+    index_proxy: "MSCI EM IMI"
+    etf_ticker: "EEM"
+
+  - name: "Small Caps"
+    index_proxy: "MSCI World Small Cap"
+    etf_ticker: "VSS"
+
+  - name: "Japan"
+    index_proxy: "MSCI Japan"
+    etf_ticker: "EWJ"
+
+  - name: "Pacific ex-Japan"
+    index_proxy: "MSCI Pacific ex-Japan"
+    etf_ticker: "EPP"
