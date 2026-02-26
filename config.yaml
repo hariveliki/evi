@@ -43,30 +43,24 @@ calculation_parameters:
 regions:
   - name: "North America"
     index_proxy: "S&P 500"
-    etf_ticker: "CSPX.L"
-    etf_isin: "IE00B5BMR087"
+    etf_ticker: "SPY"
 
   - name: "Europe"
     index_proxy: "Stoxx Europe 600"
-    etf_ticker: "LYP6.DE"
-    etf_isin: "LU0908500753"
+    etf_ticker: "VGK"
 
   - name: "Emerging Markets"
     index_proxy: "MSCI EM IMI"
-    etf_ticker: "EIMI.L"
-    etf_isin: "IE00BKM4GZ66"
+    etf_ticker: "EEM"
 
   - name: "Small Caps"
     index_proxy: "MSCI World Small Cap"
-    etf_ticker: "WSML.L"
-    etf_isin: "IE00BF4RFH31"
+    etf_ticker: "VSS"
 
   - name: "Japan"
     index_proxy: "MSCI Japan"
     etf_ticker: "EWJ"
-    etf_isin: "LU1931974775"
 
   - name: "Pacific ex-Japan"
     index_proxy: "MSCI Pacific ex-Japan"
-    etf_ticker: "CPXJ.L"
-    etf_isin: "IE00B52MJY50"
+    etf_ticker: "EPP"
