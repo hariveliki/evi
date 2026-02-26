@@ -46,9 +46,9 @@ The system implements a nine-step pipeline from raw valuation data to final cons
 
 ## 2. Objective
 
-Produce a set of portfolio weights \( w_i \) for each region \( i \) such that:
+Produce a set of portfolio weights $ w_i $ for each region $ i $ such that:
 
-- \( \sum_i w_i = 1 \)
+- $ \sum_i w_i = 1 $
 - Regions trading at high valuations relative to their historical norms are underweighted
 - Regions trading at low valuations relative to their historical norms are overweighted
 - Weights respect practical portfolio constraints (floors, ceilings, turnover limits)
@@ -148,8 +148,8 @@ Default `lookback_years = 10`.
 
 | Method | Formula |
 |---|---|
-| `rolling_median` (default) | \( B_m = \text{median}(\{v_t : t \in [cutoff, effective]\}) \) |
-| `rolling_mean` | \( B_m = \text{mean}(\{v_t : t \in [cutoff, effective]\}) \) |
+| `rolling_median` (default) | $ B_m = \text{median}(\{v_t : t \in [cutoff, effective]\}) $ |
+| `rolling_mean` | $ B_m = \text{mean}(\{v_t : t \in [cutoff, effective]\}) $ |
 | `fixed` | Uses the first value in the window |
 
 If insufficient data exists, the baseline returns `None` and the metric is treated as missing.
@@ -166,9 +166,9 @@ For each metric where both current value and baseline are available, a **valuati
 
 | Method | Formula | Interpretation |
 |---|---|---|
-| `log_ratio` (default) | \( s = \ln\!\left(\dfrac{V_{\text{current}}}{B}\right) \) | Symmetric treatment of over/undervaluation on a log scale |
-| `zscore` | \( s = \dfrac{V_{\text{current}} - B}{B} \) | Percentage deviation from baseline |
-| `percentile` | \( s = \dfrac{V_{\text{current}} - B}{B} \) | Same as zscore (simplified) |
+| `log_ratio` (default) | $ s = \ln\!\left(\dfrac{V_{\text{current}}}{B}\right) $ | Symmetric treatment of over/undervaluation on a log scale |
+| `zscore` | $ s = \dfrac{V_{\text{current}} - B}{B} $ | Percentage deviation from baseline |
+| `percentile` | $ s = \dfrac{V_{\text{current}} - B}{B} $ | Same as zscore (simplified) |
 
 **Sign convention:**
 - **Positive score** → current valuation **exceeds** baseline → region is **overvalued**
@@ -191,7 +191,7 @@ $$
 
 Default limits: `[-2.5, +2.5]`.
 
-This bounds the maximum impact any single metric can have on the adjustment factor. With the default `exp_score` adjustment function and `k=0.8`, a score of ±2.5 produces an adjustment factor of \( e^{\mp 2.0} \approx 7.39 \) or \( 0.135 \), limiting the maximum tilt to roughly 7.4× the market-cap weight.
+This bounds the maximum impact any single metric can have on the adjustment factor. With the default `exp_score` adjustment function and `k=0.8`, a score of ±2.5 produces an adjustment factor of $ e^{\mp 2.0} \approx 7.39 $ or $ 0.135 $, limiting the maximum tilt to roughly 7.4× the market-cap weight.
 
 Winsorization can be disabled via configuration.
 
@@ -205,11 +205,11 @@ The individual P/E and P/B scores are combined into a single composite valuation
 
 **Formula (both metrics available):**
 
-\[
+$$
 S_{\text{composite}} = w_{PE} \cdot s_{PE} + w_{PB} \cdot s_{PB}
-\]
+$$
 
-Default weights: \( w_{PE} = 0.6 \), \( w_{PB} = 0.4 \).
+Default weights: $ w_{PE} = 0.6 $, $ w_{PB} = 0.4 $.
 
 **Missing metric handling** (controlled by `missing_metric_rule`):
 
@@ -231,20 +231,20 @@ The composite score is transformed into a multiplicative adjustment factor that 
 
 | Function | Formula | Properties |
 |---|---|---|
-| `exp_score` (default) | \( f = e^{-k \cdot S_{\text{composite}}} \) | Always positive; \( f > 1 \) when undervalued (\( S < 0 \)); \( f < 1 \) when overvalued (\( S > 0 \)); \( f = 1 \) when fairly valued (\( S = 0 \)) |
-| `inverse_ratio` | \( f = \dfrac{1}{\alpha + \beta \cdot e^{S_{\text{composite}}}} \) | Bounded; approaches \( 1/\alpha \) for strongly undervalued regions and approaches 0 for strongly overvalued regions |
+| `exp_score` (default) | $ f = e^{-k \cdot S_{\text{composite}}} $ | Always positive; $ f > 1 $ when undervalued ($ S < 0 $); $ f < 1 $ when overvalued ($ S > 0 $); $ f = 1 $ when fairly valued ($ S = 0 $) |
+| `inverse_ratio` | $ f = \dfrac{1}{\alpha + \beta \cdot e^{S_{\text{composite}}}} $ | Bounded; approaches $ 1/\alpha $ for strongly undervalued regions and approaches 0 for strongly overvalued regions |
 
-**Default parameter:** \( k = 0.8 \) (strength parameter controlling sensitivity).
+**Default parameter:** $ k = 0.8 $ (strength parameter controlling sensitivity).
 
 **Behavior of the default `exp_score` function:**
 
 | Composite Score | Adjustment Factor | Effect |
 |---|---|---|
-| -1.0 (undervalued) | \( e^{0.8} \approx 2.23 \) | Weight roughly doubles |
-| -0.5 | \( e^{0.4} \approx 1.49 \) | Weight increases ~49% |
+| -1.0 (undervalued) | $ e^{0.8} \approx 2.23 $ | Weight roughly doubles |
+| -0.5 | $ e^{0.4} \approx 1.49 $ | Weight increases ~49% |
 | 0.0 (fair value) | 1.0 | No change |
-| +0.5 (overvalued) | \( e^{-0.4} \approx 0.67 \) | Weight decreases ~33% |
-| +1.0 | \( e^{-0.8} \approx 0.45 \) | Weight roughly halves |
+| +0.5 (overvalued) | $ e^{-0.4} \approx 0.67 $ | Weight decreases ~33% |
+| +1.0 | $ e^{-0.8} \approx 0.45 $ | Weight roughly halves |
 
 If the composite score is NaN (from `drop_region` rule), the adjustment factor defaults to 1.0.
 
@@ -256,11 +256,11 @@ If the composite score is NaN (from `drop_region` rule), the adjustment factor d
 
 The raw (unnormalized) EVI weight for each region is:
 
-\[
+$$
 w_i^{\text{raw}} = w_i^{\text{mcap}} \times f_i
-\]
+$$
 
-where \( w_i^{\text{mcap}} \) is the market-cap weight and \( f_i \) is the adjustment factor.
+where $ w_i^{\text{mcap}} $ is the market-cap weight and $ f_i $ is the adjustment factor.
 
 **Source:** `evi_weights/calculator.py`, line 378.
 
@@ -270,9 +270,9 @@ where \( w_i^{\text{mcap}} \) is the market-cap weight and \( f_i \) is the adju
 
 Raw weights are normalized to sum to 1.0:
 
-\[
+$$
 w_i^{\text{norm}} = \frac{w_i^{\text{raw}}}{\sum_j w_j^{\text{raw}}}
-\]
+$$
 
 Regions with NaN composite scores (from the `drop_region` rule) are excluded before normalization.
 
@@ -282,13 +282,13 @@ Regions with NaN composite scores (from the `drop_region` rule) are excluded bef
 
 ### 5.9 Shrinkage Toward Market-Cap Weights
 
-To moderate the EVI tilt and improve robustness, the normalized EVI weights are blended back toward market-cap weights using a shrinkage parameter \( \lambda \):
+To moderate the EVI tilt and improve robustness, the normalized EVI weights are blended back toward market-cap weights using a shrinkage parameter $ \lambda $:
 
-\[
+$$
 w_i^{\text{shrunk}} = (1 - \lambda) \cdot w_i^{\text{norm}} + \lambda \cdot w_i^{\text{mcap}}
-\]
+$$
 
-Default: \( \lambda = 0.20 \), meaning the final weight is 80% EVI signal and 20% market-cap anchor.
+Default: $ \lambda = 0.20 $, meaning the final weight is 80% EVI signal and 20% market-cap anchor.
 
 The shrunk weights are then re-normalized to sum to 1.0.
 
@@ -332,9 +332,9 @@ The absolute floor/ceiling constraints take priority over the relative over/unde
 
 If previous period weights are provided, total portfolio turnover is limited:
 
-\[
+$$
 \text{turnover} = \sum_i |w_i^{\text{new}} - w_i^{\text{prev}}|
-\]
+$$
 
 If turnover exceeds the cap (default: 10 percentage points = 0.10):
 
@@ -436,12 +436,12 @@ All parameters are defined in `config.yaml` and loaded via `evi_weights/config.p
 
 When using the built-in sample data generator, each region's valuation series is constructed from a parametric model:
 
-\[
+$$
 V_t = \text{base} + \text{trend} \times t + \text{cycle\_amp} \times \sin\!\left(\frac{2\pi t}{16}\right) + \text{shock}_t + \epsilon_t
-\]
+$$
 
 where:
-- \( t \) is the quarter index (0 = Q1 2014)
+- $ t $ is the quarter index (0 = Q1 2014)
 - `base` is the starting level for the metric
 - `trend` is a linear drift per quarter
 - `cycle_amp` modulates a sinusoidal cycle with a period of 16 quarters (4 years)
@@ -449,7 +449,7 @@ where:
   - **COVID dip** at quarter 24 (Q1 2020) with partial recovery in Q2 2020
   - **Post-COVID boom** ramping from Q3 2020 to peak at quarter 30 (Q3 2021)
   - **2022 correction** from peak to trough at quarter 33 (Q2 2022), recovering over 3 quarters
-- \( \epsilon_t \sim \mathcal{N}(0, \text{base} \times \text{noise\_scale}) \) is Gaussian noise
+- $ \epsilon_t \sim \mathcal{N}(0, \text{base} \times \text{noise\_scale}) $ is Gaussian noise
 
 Values are floored at 40% of the base level to prevent unrealistic readings.
 
@@ -516,7 +516,7 @@ The log-ratio method treats overvaluation and undervaluation symmetrically on a 
 The `exp(-k × score)` function provides smooth, always-positive adjustment factors. The parameter `k` controls how aggressively the system tilts away from overvalued markets. Higher `k` → more aggressive value tilting.
 
 ### 10.3 Shrinkage Toward MCAP
-Blending with market-cap weights serves as a regularizer. It reduces estimation error impact, keeps the portfolio investable for large allocators, and prevents extreme tilts when valuation signals are noisy. The default \( \lambda = 0.20 \) represents a moderately value-tilted strategy.
+Blending with market-cap weights serves as a regularizer. It reduces estimation error impact, keeps the portfolio investable for large allocators, and prevents extreme tilts when valuation signals are noisy. The default $ \lambda = 0.20 $ represents a moderately value-tilted strategy.
 
 ### 10.4 Rolling Median (vs. Mean) Baseline
 The median is robust to outliers and structural breaks in the data. Extreme valuation episodes (e.g., the 2000 tech bubble) have less influence on the baseline compared to the mean.
