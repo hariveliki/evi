@@ -16,6 +16,7 @@ from evi_weights.data_provider import (
     generate_sample_data,
     get_region_data,
 )
+from evi_weights.ticker_resolver import resolve_ticker_from_isin
 
 
 def _format_pct(val: float | None, decimals: int = 2) -> str:
@@ -146,6 +147,7 @@ examples:
   python main.py --verbose                 # Show detailed diagnostics
   python main.py --config my_config.yaml   # Use custom config
   python main.py --source live             # Fetch live data via yfinance
+  python main.py --resolve-isin IE00B5BMR087
   python main.py --output json             # Output as JSON
   python main.py --export-data data.json   # Export sample data to JSON file
         """,
@@ -185,8 +187,40 @@ examples:
         default=None,
         help="Export generated sample data to a JSON file",
     )
+    parser.add_argument(
+        "--resolve-isin",
+        type=str,
+        default=None,
+        help="Resolve an ETF ISIN to the best yfinance ticker and exit",
+    )
 
     args = parser.parse_args(argv)
+
+    if args.resolve_isin:
+        try:
+            resolved = resolve_ticker_from_isin(args.resolve_isin)
+        except Exception as exc:
+            print(f"Failed to resolve ticker from ISIN: {exc}", file=sys.stderr)
+            sys.exit(1)
+
+        if args.output == "json":
+            print(json.dumps(resolved, indent=2))
+        elif args.verbose:
+            print(f"ISIN: {resolved['isin']}")
+            print(f"Best ticker: {resolved['ticker']}")
+            print(f"Has valuation data: {resolved['has_valuation']}")
+            print(f"Has asset size data: {resolved['has_assets']}")
+            if resolved["name"]:
+                print(f"Name: {resolved['name']}")
+            print("\nCandidates tested:")
+            for item in resolved["candidates_tested"]:
+                print(
+                    f"  - {item['symbol']}"
+                    f" (score={item['score']}, valuation={item['has_valuation']}, assets={item['has_assets']})"
+                )
+        else:
+            print(resolved["ticker"])
+        return
 
     config = load_config(args.config)
 
