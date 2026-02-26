@@ -81,9 +81,9 @@ The system supports three data sources:
 
 A configurable `data_lag_days` (default: 5) is subtracted from the as-of date to produce the **effective date**, accounting for the delay between market close and data availability:
 
-```
-effective_date = as_of_date - data_lag_days
-```
+$$
+\text{effective\_date} = \text{as\_of\_date} - \text{data\_lag\_days}
+$$
 
 ---
 
@@ -117,9 +117,9 @@ Across all regions:
 
 ### 5.1 Effective Date Computation
 
-```
-effective_date = as_of_date - timedelta(days=data_lag_days)
-```
+$$
+\text{effective\_date} = \text{as\_of\_date} - \operatorname{timedelta}(\text{days}=\text{data\_lag\_days})
+$$
 
 With default settings (`data_lag_days=5`), if as-of date is 2025-12-31, the effective date is 2025-12-26.
 
@@ -133,9 +133,9 @@ For each valuation metric (P/E and P/B), a baseline is computed from historical 
 
 **Window selection:** Only observations where `cutoff ≤ date ≤ effective_date` are included, where:
 
-```
-cutoff = effective_date - lookback_years
-```
+$$
+\text{cutoff} = \text{effective\_date} - \text{lookback\_years}
+$$
 
 Default `lookback_years = 10`.
 
@@ -185,9 +185,9 @@ For each metric where both current value and baseline are available, a **valuati
 
 Extreme scores are clipped to prevent outliers from dominating the allocation.
 
-```
-s_clipped = max(lower_limit, min(upper_limit, s))
-```
+$$
+s_{\text{clipped}} = \max\!\left(\text{lower\_limit},\, \min(\text{upper\_limit},\, s)\right)
+$$
 
 Default limits: `[-2.5, +2.5]`.
 
@@ -338,10 +338,13 @@ If previous period weights are provided, total portfolio turnover is limited:
 
 If turnover exceeds the cap (default: 10 percentage points = 0.10):
 
-```
-scale = cap / total_turnover
-w_i = w_i_prev + (w_i_new - w_i_prev) × scale
-```
+$$
+\text{scale} = \frac{\text{cap}}{\text{total\_turnover}}
+$$
+
+$$
+w_i = w_i^{\text{prev}} + \left(w_i^{\text{new}} - w_i^{\text{prev}}\right) \times \text{scale}
+$$
 
 All changes are scaled proportionally, then weights are re-normalized.
 
@@ -471,28 +474,31 @@ Using sample data for **North America** (as of 2025-12-31):
 From the sample history, the median P/E over the lookback window (2015-12-26 to 2025-12-26) yields a baseline around 25–27. The median P/B yields a baseline around 4.5–5.0.
 
 ### Step 2 — Score (log ratio)
-```
-PE score = ln(30.88 / baseline_PE)    → positive (overvalued)
-PB score = ln(6.29 / baseline_PB)     → positive (overvalued)
-```
+$$
+s_{PE} = \ln\!\left(\frac{30.88}{B_{PE}}\right) \quad \Rightarrow \text{positive (overvalued)}
+$$
+
+$$
+s_{PB} = \ln\!\left(\frac{6.29}{B_{PB}}\right) \quad \Rightarrow \text{positive (overvalued)}
+$$
 
 ### Step 3 — Winsorize
 Both scores are within [-2.5, +2.5], so no clipping occurs.
 
 ### Step 4 — Composite
-```
-composite = 0.6 × PE_score + 0.4 × PB_score    → positive
-```
+$$
+S_{\text{composite}} = 0.6 \times s_{PE} + 0.4 \times s_{PB} \quad \Rightarrow \text{positive}
+$$
 
 ### Step 5 — Adjustment Factor
-```
-factor = exp(-0.8 × composite)    → less than 1.0 (weight reduced)
-```
+$$
+f = \exp\!\left(-0.8 \times S_{\text{composite}}\right) \quad \Rightarrow f < 1.0\; (\text{weight reduced})
+$$
 
 ### Step 6 — Raw Weight
-```
-raw_weight = 0.752 × factor    → less than 0.752
-```
+$$
+w_{\text{raw}} = 0.752 \times f \quad \Rightarrow w_{\text{raw}} < 0.752
+$$
 
 ### Steps 7–10
 After normalization, shrinkage (blending 20% toward MCAP), and constraint application, North America's final weight is reduced from its ~75.2% market-cap weight, reflecting its above-historical valuation levels.
