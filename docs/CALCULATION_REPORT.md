@@ -82,7 +82,7 @@ The system supports three data sources:
 A configurable `data_lag_days` (default: 5) is subtracted from the as-of date to produce the **effective date**, accounting for the delay between market close and data availability:
 
 $$
-\text{effective\_date} = \text{as\_of\_date} - \text{data\_lag\_days}
+\mathrm{effectiveDate} = \mathrm{asOfDate} - \mathrm{dataLagDays}
 $$
 
 ---
@@ -118,7 +118,7 @@ Across all regions:
 ### 5.1 Effective Date Computation
 
 $$
-\text{effective\_date} = \text{as\_of\_date} - \operatorname{timedelta}(\text{days}=\text{data\_lag\_days})
+\mathrm{effectiveDate} = \mathrm{asOfDate} - \mathrm{timedelta}(\mathrm{days}=\mathrm{dataLagDays})
 $$
 
 With default settings (`data_lag_days=5`), if as-of date is 2025-12-31, the effective date is 2025-12-26.
@@ -134,7 +134,7 @@ For each valuation metric (P/E and P/B), a baseline is computed from historical 
 **Window selection:** Only observations where `cutoff ≤ date ≤ effective_date` are included, where:
 
 $$
-\text{cutoff} = \text{effective\_date} - \text{lookback\_years}
+\mathrm{cutoff} = \mathrm{effectiveDate} - \mathrm{lookbackYears}
 $$
 
 Default `lookback_years = 10`.
@@ -186,7 +186,7 @@ For each metric where both current value and baseline are available, a **valuati
 Extreme scores are clipped to prevent outliers from dominating the allocation.
 
 $$
-s_{\text{clipped}} = \max\!\left(\text{lower\_limit},\, \min(\text{upper\_limit},\, s)\right)
+s_{\text{clipped}} = \max\!\left(\mathrm{lowerLimit},\, \min(\mathrm{upperLimit},\, s)\right)
 $$
 
 Default limits: `[-2.5, +2.5]`.
@@ -339,7 +339,7 @@ $$
 If turnover exceeds the cap (default: 10 percentage points = 0.10):
 
 $$
-\text{scale} = \frac{\text{cap}}{\text{total\_turnover}}
+\mathrm{scale} = \frac{\mathrm{cap}}{\mathrm{totalTurnover}}
 $$
 
 $$
@@ -437,7 +437,7 @@ All parameters are defined in `config.yaml` and loaded via `evi_weights/config.p
 When using the built-in sample data generator, each region's valuation series is constructed from a parametric model:
 
 $$
-V_t = \text{base} + \text{trend} \times t + \text{cycle\_amp} \times \sin\!\left(\frac{2\pi t}{16}\right) + \text{shock}_t + \epsilon_t
+V_t = \mathrm{base} + \mathrm{trend} \times t + \mathrm{cycleAmp} \times \sin\!\left(\frac{2\pi t}{16}\right) + \mathrm{shock}_t + \epsilon_t
 $$
 
 where:
@@ -449,7 +449,7 @@ where:
   - **COVID dip** at quarter 24 (Q1 2020) with partial recovery in Q2 2020
   - **Post-COVID boom** ramping from Q3 2020 to peak at quarter 30 (Q3 2021)
   - **2022 correction** from peak to trough at quarter 33 (Q2 2022), recovering over 3 quarters
-- $\epsilon_t \sim \mathcal{N}(0, \text{base} \times \text{noise\_scale})$ is Gaussian noise
+- $\epsilon_t \sim \mathcal{N}(0, \mathrm{base} \times \mathrm{noiseScale})$ is Gaussian noise
 
 Values are floored at 40% of the base level to prevent unrealistic readings.
 
