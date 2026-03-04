@@ -263,9 +263,7 @@ def _normalize_mcap_weights(regions: list[RegionData]) -> None:
             r.mcap_weight = round(r.mcap_weight / total, 6)
 
 
-def load_data_from_json(
-    path: str | Path, config: EVIConfig
-) -> list[RegionData]:
+def load_data_from_json(path: str | Path, config: EVIConfig) -> list[RegionData]:
     """Load region data from a JSON file."""
     path = Path(path)
     with open(path) as f:
@@ -315,9 +313,7 @@ def load_data_from_json(
     return region_data_list
 
 
-def export_data_to_json(
-    regions: list[RegionData], path: str | Path
-) -> None:
+def export_data_to_json(regions: list[RegionData], path: str | Path) -> None:
     """Export region data to a JSON file for future use."""
     path = Path(path)
     output: dict = {"regions": {}}

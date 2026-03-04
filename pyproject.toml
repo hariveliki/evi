@@ -6,7 +6,6 @@ build-backend = "hatchling.build"
 name = "evi-weights"
 version = "1.0.0"
 description = "Equal-Value-Index (EVI) Weights Calculator"
-readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
   "numpy>=1.24.0",
@@ -14,14 +13,19 @@ dependencies = [
   "pyyaml>=6.0",
   "tabulate>=0.9.0",
   "yfinance>=0.2.30",
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "sqlalchemy>=2.0.0",
 ]
 
 [project.scripts]
 evi-weights = "evi_weights.cli:main"
+evi-server = "evi_weights.api.app:run_server"
 
 [dependency-groups]
 dev = [
   "pytest>=7.4.0",
+  "httpx>=0.27.0",
 ]
 
 [tool.pytest.ini_options]
